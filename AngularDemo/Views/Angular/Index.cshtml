@@ -1,0 +1,73 @@
+﻿@model AngularDemo.ViewModels.Angular.DummyViewModel
+@{
+    ViewBag.Title = "AngularJS Demo homepage";
+    ViewBag.AngularAppName = "";
+}
+
+<div class="jumbotron">
+    <h1>Welcome, {{yourName || "Attendees"}}!</h1>
+    <p class="lead">Lets investigate AngularJS and ASP.NET MVC with a few simple demonstrations.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Basic Binding</h2>
+        <p>Simple binding with Angular.  Nothing special, just tell us who you are and look above!</p>
+        <p><input type ="text" ng-model="yourName" placeholder="Enter a Name Here" /></p>
+    </div>
+    <div class="col-md-4">
+        <h2>Basic Binding: MVC</h2>
+        <p>It is very easy to incorporate things from a View Model here as well.  Just noted that _ in attribute names become - as rendered!</p>
+        <div class="form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(m => m.FirstName, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", ng_model = "firstName" })
+                </div>
+            </div>
+        </div>
+        <p>You Entered: {{firstName}}</p>
+    </div>
+    <div class="col-md-4">
+        <h3>Basic String Manipulation</h3>
+        <p>{{yourName + " " + firstName}}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Directives & Binding</h2>
+        <div  ng-init="myName='Mitchel Sellers'; Number1=2; Number2=2">
+            <p>{{myName}}</p>
+            <p>2 * 2 = {{Number1*Number2}}</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h2>More Complex Binding</h2>
+        <p>Price 1: <input type="number" ng-model="Price1" /></p>
+        <p>Price 2: <input type="number" ng-model="Price2" /></p>
+        <p>Total: {{Price1 + Price2}}</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Repeating Content</h2>
+        <div ng-init="favoriteConferences=['2011 Code PaLOUsa', '2012 Code PaLOUsa', '2013 Code PaLOUsa']">
+            <ul>
+                <li ng-repeat="event in favoriteConferences">
+                    {{event}}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>More Bindings! Field Length</h2>
+        <p><textarea  ng-model="MemoField" ng-disabled="MemoField.length >= 150"></textarea></p>
+        <p>You have entered {{MemoField.length}} characters.<br />
+            You have {{150 - MemoField.length}} characters left.</p>
+    </div>
+    <div class="col-md-8">
+        <h2>Shopping List Demo</h2>
+        <p>View this detailed demo here @Html.ActionLink("Shopping List Demo", "ShoppingList", "Angular")</p>
+    </div>
+</div>

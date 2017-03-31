@@ -1,0 +1,121 @@
+﻿@using Newtonsoft.Json
+@model AngularDemo.ViewModels.Angular.ShoppingListViewModel
+
+@{
+    ViewBag.Title = "AngularJS Shopping List!";
+    ViewBag.AngularAppName = "shoppingListApp";
+}
+
+<div class="jumbotron">
+    <h1>Welcome! </h1>
+    <p class="lead">
+        Shopping List Application.  This demo shows a sample Single Page Application that loads prior input information
+        and allowing interactive application management locally.  Users can then submit the information to the server at their discretion.
+    </p>
+</div>
+
+<div class="row" ng-controller="shoppingController">
+    <div class="col-md-4">
+        <h2>
+            My Shopping List<br />
+            <small>{{remaining()}} of {{shoppingItems.length}} remaining</small>
+        </h2>
+        <ul>
+            <li ng-repeat="item in shoppingItems | orderBy:listOrder">
+                <input type="checkbox" ng-model="item.IsComplete" ng-change="completionToggled()" />
+                <span class="done-{{item.IsComplete}}">{{item.ItemToGet}}</span>
+            </li>
+        </ul>
+        <p>
+            Order by:
+            <select ng-model="listOrder">
+                <option value="ItemToGet">Item Description</option>
+                <option value="IsComplete">Status</option>
+            </select>
+        </p>
+        <p>
+            
+            
+        </p>
+    </div>
+    <div class="col-md-4">
+        <form ng-submit="addItem()">
+            <h2>Add Item To List</h2>
+            <p><input type="text" ng-model="newItemText" placeholder="New Item" /></p>
+            <p><input class="btn btn-primary" type="submit" value="Add Item" /></p>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <h2>List Actions</h2>
+        <p>Below actions will appear/disappear as the status of the page changes.</p>
+        <div class="alert alert-success" id="success" role="alert" style="display:none;">
+            Server updated successfully!
+        </div>
+        <p>
+            <a class="btn btn-primary" href="" ng-show="isDirty" ng-click="storeList()">Store List</a>
+        </p>
+        <p>
+            <a class="btn btn-danger" href="" ng-show="(shoppingItems.length - remaining())>0" ng-click="removeCompleted()">Remove Completed Items</a>
+        </p>
+    </div>
+</div>
+<style>
+    .done-true {
+        text-decoration: line-through;
+        background-color: lightgray;
+    }
+</style>
+
+<script type="text/javascript">
+
+    angular.module('shoppingListApp', [])
+        .controller('shoppingController', function ($scope, $http) {
+
+            //Define our properties
+            $scope.shoppingItems = @Html.Raw(JsonConvert.SerializeObject(Model.Items));
+        $scope.listOrder = "ItemToGet"; //Default to this
+        $scope.isDirty = false;
+
+        $scope.completionToggled = function (){$scope.isDirty=true;}
+
+        $scope.addItem = function () {
+            $scope.shoppingItems.push({ ItemId:-1, ItemToGet: $scope.newItemText, IsComplete: false });
+            $scope.newItemText = '';
+            $scope.isDirty = true;
+        };
+
+        $scope.remaining = function () {
+            var count = 0;
+            angular.forEach($scope.shoppingItems, function (item) {
+                count += item.IsComplete ? 0 : 1;
+            });
+            return count;
+        };
+
+        $scope.removeCompleted = function () {
+            var oldList = $scope.shoppingItems;
+            $scope.shoppingItems = [];
+            angular.forEach(oldList, function (item) {
+                if (!item.IsComplete) $scope.shoppingItems.push(item);
+            });
+            $scope.isDirty = true;
+        };
+
+        $scope.storeList = function() {
+            $http({
+                method: 'POST',
+                url: '/Angular/StoreShoppingList',
+                data: $scope.shoppingItems
+            }).success(function(data) {
+                //alert(data);
+                jQuery('#success').
+                    show().delay(2000).fadeOut('fast');
+                $scope.isDirty = false; //Reset after saving
+            });
+        }
+    });
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jquery")
+}
